@@ -1,3 +1,14 @@
+import java.util.*
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val tmdbAccessToken = localProperties["TMDB_ACCESS_TOKEN"] as String?
+    ?: "Register your access token from TMDB and place it in local.properties as `TMDB_ACCESS_TOKEN`."
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -14,6 +25,8 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "TMDB_ACCESS_TOKEN", tmdbAccessToken)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
