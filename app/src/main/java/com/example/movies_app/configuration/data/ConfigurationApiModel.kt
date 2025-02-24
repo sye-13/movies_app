@@ -10,6 +10,6 @@ data class ConfigurationApiModel(
 
 @Serializable
 data class ConfigurationImage(
-    @SerialName("base_url")
+    @SerialName("secure_base_url")
     val baseUrl: String
 )
