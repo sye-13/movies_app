@@ -1,10 +1,10 @@
-package com.example.movies_app.topratedmovies.data
+package com.example.movies_app.movie.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MovieApiModel(
+data class TopMovieApiModel(
     val id: String,
     @SerialName("poster_path")
     val posterPath: String,

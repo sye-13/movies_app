@@ -52,7 +52,7 @@ fun TopRatedMoviesScreen(state: TopRatedMoviesState, onItemClick: (String) -> Un
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Content(
-    topMovies: List<MovieUi>,
+    topMovies: List<TopRatedMovieUi>,
     onItemClick: (String) -> Unit
 ) {
     Column {
@@ -71,7 +71,7 @@ private fun Content(
 
 @Composable
 fun MovieItem(
-    movie: MovieUi,
+    movie: TopRatedMovieUi,
     onItemClick: (String) -> Unit
 ) {
     Card(

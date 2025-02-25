@@ -3,8 +3,8 @@ package com.example.movies_app.topratedmovies.ui
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movies_app.topratedmovies.domain.MovieEntity
 import com.example.movies_app.topratedmovies.domain.FetchTopRatedMoviesUseCase
+import com.example.movies_app.topratedmovies.domain.TopRatedMovieEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,11 +19,15 @@ import javax.inject.Inject
 @Immutable
 sealed interface TopRatedMoviesState {
     data object Loading : TopRatedMoviesState
-    data class Content(val movies: List<MovieUi>) : TopRatedMoviesState
+    data class Content(val movies: List<TopRatedMovieUi>) : TopRatedMoviesState
     data object Error : TopRatedMoviesState
 }
 
-data class MovieUi(val id: String, val posterPath: String, val title: String)
+data class TopRatedMovieUi(
+    val id: String,
+    val posterPath: String,
+    val title: String
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -33,9 +37,9 @@ class TopRatedMoviesViewModel @Inject constructor(
     private val pageIndex: MutableStateFlow<Int> = MutableStateFlow(1)
     val uiState: StateFlow<TopRatedMoviesState> = pageIndex.flatMapLatest { page ->
         fetchTopRatedMoviesUseCase(page)
-            .map<List<MovieEntity>, TopRatedMoviesState> {
+            .map<List<TopRatedMovieEntity>, TopRatedMoviesState> {
                 TopRatedMoviesState.Content(it.map { movie ->
-                    MovieUi(
+                    TopRatedMovieUi(
                         movie.id,
                         movie.posterPath,
                         movie.title
