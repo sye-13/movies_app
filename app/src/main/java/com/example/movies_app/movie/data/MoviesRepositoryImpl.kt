@@ -8,4 +8,6 @@ class MoviesRepositoryImpl @Inject constructor(
 ) : MoviesRepository {
     override suspend fun fetchTopRatedMovies(page: Int): TopRatedMoviesApiModel =
         dataSource.fetchTopRatedMovies(page)
+
+    override suspend fun fetchMovie(id: String): MovieApiModel = dataSource.fetchMovie(id)
 }
