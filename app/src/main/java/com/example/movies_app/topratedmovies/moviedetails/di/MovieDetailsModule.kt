@@ -1,6 +1,7 @@
 package com.example.movies_app.topratedmovies.moviedetails.di
 
 import com.example.movies_app.configuration.domain.ConfigurationRepository
+import com.example.movies_app.favorites.domain.FetchFavoritesMoviesIdUseCase
 import com.example.movies_app.movie.domain.MoviesRepository
 import com.example.movies_app.topratedmovies.moviedetails.domain.FetchMovieDetailsUseCase
 import dagger.Module
@@ -15,8 +16,13 @@ object MovieDetailsModule {
     @Provides
     fun provideFetchMovieDetailsUseCase(
         moviesRepository: MoviesRepository,
-        configurationRepository: ConfigurationRepository
+        configurationRepository: ConfigurationRepository,
+        fetchFavoritesMoviesIdUseCase: FetchFavoritesMoviesIdUseCase
     ): FetchMovieDetailsUseCase {
-        return FetchMovieDetailsUseCase(moviesRepository, configurationRepository)
+        return FetchMovieDetailsUseCase(
+            moviesRepository,
+            configurationRepository,
+            fetchFavoritesMoviesIdUseCase
+        )
     }
 }

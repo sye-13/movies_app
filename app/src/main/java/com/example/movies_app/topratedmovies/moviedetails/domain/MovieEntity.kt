@@ -8,5 +8,6 @@ data class MovieEntity(
     val releaseDate: String,
     val status: String,
     val homepage: String,
-    val overview: String
+    val overview: String,
+    val isFavorite: Boolean
 )

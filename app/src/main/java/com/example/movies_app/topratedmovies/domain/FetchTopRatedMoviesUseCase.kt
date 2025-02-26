@@ -11,17 +11,18 @@ class FetchTopRatedMoviesUseCase @Inject constructor(
     private val moviesRepository: MoviesRepository,
     private val configurationRepository: ConfigurationRepository,
 ) {
-    operator fun invoke(page: Int, width: String = "w185"): Flow<List<TopRatedMovieEntity>> = combine(
-        flow { emit(moviesRepository.fetchTopRatedMovies(page)) },
-        configurationRepository.fetchConfiguration(),
-    ) { movies, configuration ->
-        val baseUrl = "${configuration.images.baseUrl}$width"
-        movies.results.map {
-            TopRatedMovieEntity(
-                it.id,
-                "$baseUrl${it.posterPath}",
-                it.title,
-            )
+    operator fun invoke(page: Int, width: String = "w185"): Flow<List<TopRatedMovieEntity>> =
+        combine(
+            flow { emit(moviesRepository.fetchTopRatedMovies(page)) },
+            configurationRepository.fetchConfiguration(),
+        ) { movies, configuration ->
+            val baseUrl = "${configuration.images.baseUrl}$width"
+            movies.results.map {
+                TopRatedMovieEntity(
+                    it.id,
+                    "$baseUrl${it.posterPath}",
+                    it.title,
+                )
+            }
         }
-    }
 }

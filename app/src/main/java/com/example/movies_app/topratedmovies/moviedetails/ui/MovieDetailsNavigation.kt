@@ -22,5 +22,11 @@ fun MovieDetailsRoute() {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     MovieDetailsScreen(
         state = state,
+        onToggleFavorite = {
+            viewModel.onToggleFavorite()
+        },
+        onDismissFavoriteRemovalConfirmation = {
+            viewModel.onDismissFavoriteRemovalConfirmation()
+        }
     )
 }
