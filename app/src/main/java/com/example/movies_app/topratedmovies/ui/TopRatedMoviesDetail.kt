@@ -1,4 +1,4 @@
-package com.example.movies_app.topratedmovies.moviedetails.ui
+package com.example.movies_app.topratedmovies.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,27 +33,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 
 @Composable
-fun MovieDetailsScreen(
-    state: MovieDetailsState,
-    onToggleFavorite: () -> Unit,
-    onDismissFavoriteRemovalConfirmation: () -> Unit
-) {
-    when (state) {
+fun TopRatedMoviesDetail(id: String) {
+    val viewModel = hiltViewModel<MovieDetailsViewModel, MovieDetailsViewModel.Factory>(
+        creationCallback = { factory ->
+            factory.create(id = id)
+        },
+        key = id
+    )
+    when (val uiState = viewModel.uiState.collectAsStateWithLifecycle().value) {
         is MovieDetailsState.Content -> Content(
-            movie = state.movieUi,
-            isAskingFavoriteRemovalConfirmation = state.isAskingFavoriteRemovalConfirmation,
-            onToggleFavorite = onToggleFavorite,
-            onDismissFavoriteRemovalConfirmation = onDismissFavoriteRemovalConfirmation,
+            movie = uiState.movieUi,
+            isAskingFavoriteRemovalConfirmation = uiState.isAskingFavoriteRemovalConfirmation,
+            onToggleFavorite = {
+                viewModel.onToggleFavorite()
+            },
+            onDismissFavoriteRemovalConfirmation = {
+                viewModel.onDismissFavoriteRemovalConfirmation()
+            }
         )
 
         MovieDetailsState.Error -> Text(
+            text = "Error",
             modifier = Modifier
                 .fillMaxSize()
-                .wrapContentSize(),
-            text = "Error",
+                .wrapContentSize()
         )
 
         MovieDetailsState.Loading -> CircularProgressIndicator(
@@ -66,7 +74,7 @@ fun MovieDetailsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Content(
+private fun Content(
     movie: MovieUi,
     isAskingFavoriteRemovalConfirmation: Boolean,
     onToggleFavorite: () -> Unit,
@@ -79,23 +87,23 @@ fun Content(
             onDismissFavoriteRemovalConfirmation = onDismissFavoriteRemovalConfirmation
         )
     }
+    TopAppBar(
+        title = { Text(text = movie.title) },
+        actions = {
+            IconButton(
+                onClick = { onToggleFavorite() },
+            ) {
+                Icon(
+                    imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    contentDescription = if (movie.isFavorite) "Remove from favorites" else "Add to favorites",
+                    tint = Color.Red
+                )
+            }
+        }
+    )
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
     ) {
-        TopAppBar(
-            title = { Text(text = movie.title) },
-            actions = {
-                IconButton(
-                    onClick = { onToggleFavorite() },
-                ) {
-                    Icon(
-                        imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = if (movie.isFavorite) "Remove from favorites" else "Add to favorites",
-                        tint = Color.Red
-                    )
-                }
-            }
-        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -155,7 +163,7 @@ fun Content(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesRemovalConfirmationDialog(
+private fun FavoritesRemovalConfirmationDialog(
     movie: MovieUi,
     onToggleFavorite: () -> Unit,
     onDismissFavoriteRemovalConfirmation: () -> Unit

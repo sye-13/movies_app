@@ -1,4 +1,4 @@
-package com.example.movies_app.topratedmovies.moviedetails.domain
+package com.example.movies_app.topratedmovies.domain
 
 import com.example.movies_app.configuration.domain.ConfigurationRepository
 import com.example.movies_app.favorites.domain.FetchFavoritesMoviesIdUseCase

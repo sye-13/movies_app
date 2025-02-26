@@ -10,18 +10,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 object TopRatedMovies
 
-fun NavGraphBuilder.topRatedMoviesScreen(onItemClick: (String) -> Unit) {
+fun NavGraphBuilder.topRatedMoviesScreen() {
     composable<TopRatedMovies> {
-        TopRatedMoviesRoute(onItemClick = onItemClick)
+        TopRatedMoviesRoute()
     }
 }
 
 @Composable
-fun TopRatedMoviesRoute(onItemClick: (String) -> Unit) {
+fun TopRatedMoviesRoute() {
     val viewModel = hiltViewModel<TopRatedMoviesViewModel>()
-    val state = viewModel.uiState.collectAsStateWithLifecycle().value
-    TopRatedMoviesScreen(
-        state = state,
-        onItemClick = onItemClick
-    )
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    TopRatedMoviesScreen(uiState = uiState)
 }

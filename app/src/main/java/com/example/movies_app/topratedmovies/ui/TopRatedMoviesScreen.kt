@@ -1,37 +1,25 @@
 package com.example.movies_app.topratedmovies.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import android.os.Parcelable
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import kotlinx.parcelize.Parcelize
 
 @Composable
-fun TopRatedMoviesScreen(state: TopRatedMoviesState, onItemClick: (String) -> Unit) {
-    when (state) {
+fun TopRatedMoviesScreen(uiState: TopRatedMoviesState) {
+    when (uiState) {
         is TopRatedMoviesState.Content -> Content(
-            state.movies,
-            onItemClick
+            topRatedMovies = uiState.movies,
         )
 
         TopRatedMoviesState.Error -> Text(
@@ -49,58 +37,40 @@ fun TopRatedMoviesScreen(state: TopRatedMoviesState, onItemClick: (String) -> Un
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun Content(
-    topMovies: List<TopRatedMovieUi>,
-    onItemClick: (String) -> Unit
-) {
-    Column {
-        TopAppBar(title = { Text(text = "Movies") })
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-        ) {
-            items(items = topMovies,
-                key = { it.id }
-            ) { movie ->
-                MovieItem(movie, onItemClick)
-            }
-        }
-    }
-}
+@Parcelize
+class SelectedMovieId(val id: String) : Parcelable
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MovieItem(
-    movie: TopRatedMovieUi,
-    onItemClick: (String) -> Unit
+fun Content(
+    topRatedMovies: List<TopRatedMovieUi>
 ) {
-    Card(
-        modifier = Modifier
-            .clearAndSetSemantics {
-                contentDescription = movie.title
-                onClick("show the movie details") {
-                    onItemClick(movie.id)
-                    true
+    val navigator = rememberListDetailPaneScaffoldNavigator<SelectedMovieId>()
+    BackHandler(navigator.canNavigateBack()) {
+        navigator.navigateBack()
+    }
+
+    ListDetailPaneScaffold(
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        listPane = {
+            AnimatedPane {
+                TopRatedMoviesList(
+                    topRatedMovies = topRatedMovies,
+                    onItemClick = { id ->
+                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, SelectedMovieId(id))
+                    }
+                )
+            }
+        },
+        detailPane = {
+            AnimatedPane {
+                navigator.currentDestination?.content?.id?.let {
+                    TopRatedMoviesDetail(
+                        id = it
+                    )
                 }
             }
-            .fillMaxWidth()
-            .padding(12.dp),
-        shape = RoundedCornerShape(8.dp),
-        onClick = { onItemClick(movie.id) }) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AsyncImage(
-                model = movie.posterPath,
-                contentDescription = null,
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = movie.title,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
         }
-    }
+    )
 }
